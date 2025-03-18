@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Editor</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        #canvasContainer {
+            border: 2px dashed #ddd;
+            height: 60vh;
+            margin: 20px 0;
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #mainCanvas {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
+
+        .upload-placeholder {
+            position: absolute;
+            color: #666;
+            pointer-events: none;
+        }
+
+        .tools {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        button {
+            padding: 10px 20px;
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .quality-control {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .download-btn {
+            padding: 10px 20px;
+            background: #28a745;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <input type="file" id="fileInput" accept="image/*">
+        <div id="canvasContainer">
+            <div class="upload-placeholder">Upload an Image (Max 5MB)</div>
+            <canvas id="mainCanvas"></canvas>
+        </div>
+        
+        <div class="tools">
+            <button onclick="processImage('enhance')">Enhance</button>
+            <button onclick="processImage('compress')">Compress</button>
+            <div class="quality-control">
+                <label>Quality:</label>
+                <input type="range" id="quality" min="0.1" max="1" step="0.1" value="0.8">
+            </div>
+        </div>
+        
+        <a id="downloadBtn" class="download-btn">Download</a>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('mainCanvas');
+        const ctx = canvas.getContext('2d');
+        const container = document.getElementById('canvasContainer');
+        const placeholder = document.querySelector('.upload-placeholder');
+        let currentImage = null;
+        let lastOperation = 'original';
+
+        // Handle file input
+        document.getElementById('fileInput').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file && file.size > 5 * 1024 * 1024) {
+                alert('File size exceeds 5MB limit!');
+                return;
+            }
+            
+            if (file) {
+                placeholder.style.display = 'none';
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    loadImage(e.target.result);
+                    lastOperation = 'original';
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        // Load image with proper scaling
+        function loadImage(src) {
+            currentImage = new Image();
+            currentImage.onload = () => {
+                const containerWidth = container.clientWidth - 40;
+                const containerHeight = container.clientHeight - 40;
+                
+                const scale = Math.min(
+                    containerWidth / currentImage.width,
+                    containerHeight / currentImage.height
+                );
+                
+                canvas.width = currentImage.width * scale;
+                canvas.height = currentImage.height * scale;
+                ctx.drawImage(currentImage, 0, 0, canvas.width, canvas.height);
+            };
+            currentImage.src = src;
+        }
+
+        // Image processing
+        function processImage(action) {
+            if (!currentImage) {
+                alert('Please upload an image first!');
+                return;
+            }
+
+            switch(action) {
+                case 'enhance':
+                    enhanceImage();
+                    break;
+                case 'compress':
+                    compressImage();
+                    break;
+            }
+        }
+
+        function enhanceImage() {
+            ctx.filter = 'brightness(1.1) contrast(1.1) saturate(1.2)';
+            ctx.drawImage(currentImage, 0, 0, canvas.width, canvas.height);
+            ctx.filter = 'none';
+            
+            // Prepare enhanced download
+            canvas.toBlob((blob) => {
+                const url = URL.createObjectURL(blob);
+                const downloadBtn = document.getElementById('downloadBtn');
+                downloadBtn.href = url;
+                downloadBtn.download = `enhanced-${Date.now()}.jpg`;
+                downloadBtn.style.display = 'inline-block';
+            }, 'image/jpeg', 0.9);
+        }
+
+        function compressImage() {
+            const quality = document.getElementById('quality').value;
+            
+            canvas.toBlob((blob) => {
+                const url = URL.createObjectURL(blob);
+                const downloadBtn = document.getElementById('downloadBtn');
+                downloadBtn.href = url;
+                downloadBtn.download = `compressed-${Date.now()}.jpg`;
+                downloadBtn.style.display = 'inline-block';
+            }, 'image/jpeg', quality);
+        }
+    </script>
+</body>
+</html>
