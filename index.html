@@ -6,48 +6,90 @@
     <title>JPEG Optimizer | Secure Browser Compression</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
         body {
             font-family: 'Segoe UI', system-ui, sans-serif;
-            margin: 0;
             background: #f7f7f7;
             color: #2d2d2d;
-            display: flex;
             min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header {
+            background: #1c1c1c;
+            color: white;
+            padding: 15px;
+            width: 100%;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .content-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
         }
 
         .main-content {
             flex: 1;
-            margin-right: 300px;
             padding: 20px;
+            max-width: 1200px;
+            width: 100%;
+            margin: 0 auto;
         }
 
         .ad-sidebar {
-            width: 300px;
             background: #fff;
-            border-left: 1px solid #e4e4e4;
-            height: 100vh;
-            position: fixed;
-            right: 0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: -2px 0 8px rgba(0,0,0,0.05);
+            padding: 20px;
+            border-top: 1px solid #e4e4e4;
+            order: 2;
         }
 
         .upload-section {
             background: white;
             border: 2px dashed #e4e4e4;
             border-radius: 8px;
-            padding: 40px;
+            padding: 30px;
             text-align: center;
             position: relative;
-            min-height: 300px;
+            min-height: 250px;
             display: flex;
             flex-direction: column;
             justify-content: center;
             margin: 20px 0;
         }
 
+        @media (min-width: 768px) {
+            .content-container {
+                flex-direction: row;
+            }
+
+            .main-content {
+                padding: 30px;
+                margin-right: 300px;
+            }
+
+            .ad-sidebar {
+                width: 300px;
+                height: 100vh;
+                position: fixed;
+                right: 0;
+                border-top: none;
+                border-left: 1px solid #e4e4e4;
+                box-shadow: -2px 0 8px rgba(0,0,0,0.05);
+                order: 1;
+            }
+        }
+
+        /* Rest of the CSS from previous implementation */
         #fileInput {
             position: absolute;
             top: 0;
@@ -72,22 +114,26 @@
             padding: 10px;
             border-bottom: 1px solid #eee;
             align-items: center;
+            flex-wrap: wrap;
+            gap: 8px;
         }
 
         .preset-bar {
             display: flex;
             gap: 10px;
             margin: 20px 0;
+            flex-wrap: wrap;
             justify-content: center;
         }
 
         .preset-btn {
-            padding: 8px 20px;
+            padding: 8px 15px;
             border: 1px solid #0066b8;
             border-radius: 4px;
             background: white;
             color: #0066b8;
             cursor: pointer;
+            font-size: 14px;
         }
 
         .preset-btn.active {
@@ -103,6 +149,7 @@
             border-radius: 4px;
             cursor: pointer;
             margin-top: 15px;
+            width: 100%;
         }
 
         .ad-placeholder {
@@ -110,55 +157,58 @@
             padding: 20px;
             color: #888;
             border: 2px dashed #e4e4e4;
-            margin: 20px;
+            margin: 0 auto;
+            max-width: 300px;
         }
 
-        .header {
-            background: #1c1c1c;
-            color: white;
-            padding: 20px;
-            margin-bottom: 20px;
+        @media (min-width: 768px) {
+            .download-btn {
+                width: auto;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="main-content">
-        <div class="header">
-            <h1 style="margin:0;">
-                <i class="fas fa-compress-alt"></i> JPEG Optimizer
-            </h1>
-        </div>
-
-        <div class="preset-bar">
-            <button class="preset-btn active" data-quality="75">Optimum</button>
-            <button class="preset-btn" data-quality="90">Max Quality</button>
-            <button class="preset-btn" data-quality="50">Max Compression</button>
-        </div>
-
-        <div class="upload-section" id="dropZone">
-            <input type="file" id="fileInput" accept="image/jpeg" multiple>
-            <div id="uploadPrompt">
-                <i class="fas fa-cloud-upload-alt fa-3x" style="color:#0066b8;margin-bottom:15px;"></i>
-                <h2 style="margin:0 0 8px 0;">Drag JPEG Files Here</h2>
-                <p style="margin:0;color:#666;">or click to select files</p>
-            </div>
-            <div class="file-list" id="fileList"></div>
-        </div>
-
-        <button class="download-btn" id="downloadAll" style="display:none;">
-            <i class="fas fa-file-archive"></i> Download All as ZIP
-        </button>
+    <div class="header">
+        <h1 style="margin:0;font-size:1.5rem;text-align:center;">
+            <i class="fas fa-compress-alt"></i> JPEG Optimizer
+        </h1>
     </div>
 
-    <div class="ad-sidebar">
-        <div class="ad-placeholder">
-            Advertisement Space<br>
-            (300x600px)
+    <div class="content-container">
+        <div class="main-content">
+            <div class="preset-bar">
+                <button class="preset-btn active" data-quality="75">Optimum</button>
+                <button class="preset-btn" data-quality="90">Max Quality</button>
+                <button class="preset-btn" data-quality="50">Max Compression</button>
+            </div>
+
+            <div class="upload-section" id="dropZone">
+                <input type="file" id="fileInput" accept="image/jpeg" multiple>
+                <div id="uploadPrompt">
+                    <i class="fas fa-cloud-upload-alt fa-2x" style="color:#0066b8;margin-bottom:15px;"></i>
+                    <h2 style="margin:0 0 8px 0;font-size:1.2rem;">Drag JPEG Files Here</h2>
+                    <p style="margin:0;color:#666;">or click to select files</p>
+                </div>
+                <div class="file-list" id="fileList"></div>
+            </div>
+
+            <button class="download-btn" id="downloadAll" style="display:none;">
+                <i class="fas fa-file-archive"></i> Download All as ZIP
+            </button>
+        </div>
+
+        <div class="ad-sidebar">
+            <div class="ad-placeholder">
+                Advertisement Space<br>
+                (300x600px)
+            </div>
         </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
     <script>
+        // JavaScript remains the same as previous implementation
         document.addEventListener('DOMContentLoaded', () => {
             const fileInput = document.getElementById('fileInput');
             const fileList = document.getElementById('fileList');
@@ -169,10 +219,8 @@
             let compressedResults = [];
             let currentQuality = 75;
 
-            // File handling
             fileInput.addEventListener('change', handleFiles);
 
-            // Preset handling
             presets.forEach(btn => {
                 btn.addEventListener('click', () => {
                     presets.forEach(b => b.classList.remove('active'));
@@ -182,7 +230,6 @@
                 });
             });
 
-            // File processing
             async function handleFiles(e) {
                 files = [...e.target.files];
                 fileInput.value = '';
@@ -217,7 +264,6 @@
                 `).join('');
             }
 
-            // ZIP download handling
             downloadAllBtn.addEventListener('click', async () => {
                 const zip = new JSZip();
                 const folder = zip.folder('compressed_images');
@@ -233,7 +279,6 @@
                 link.click();
             });
 
-            // Helper functions
             function formatBytes(bytes) {
                 return (bytes / 1024).toFixed(1) + ' KB';
             }
