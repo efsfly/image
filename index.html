@@ -3,187 +3,193 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Image Editor</title>
+    <title>JPEG Compressor | Secure Browser-Based Optimization</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
+        /* Wolfram-inspired CSS */
+        :root {
+            --primary-dark: #1c1c1c;
+            --accent-blue: #0066b8;
+            --neutral-gray: #e4e4e4;
+            --text-primary: #2d2d2d;
         }
 
         body {
-            font-family: Arial, sans-serif;
-            padding: 20px;
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            margin: 0;
+            background: #f7f7f7;
+            color: var(--text-primary);
+        }
+
+        .header {
+            background: var(--primary-dark);
+            padding: 1rem 2rem;
+            border-bottom: 4px solid var(--accent-blue);
+        }
+
+        .header-title {
+            color: white;
+            font-size: 1.8rem;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
         }
 
         .container {
             max-width: 1200px;
-            margin: 0 auto;
+            margin: 2rem auto;
+            padding: 0 1rem;
         }
 
-        #canvasContainer {
-            border: 2px dashed #ddd;
-            height: 60vh;
-            margin: 20px 0;
-            position: relative;
-            display: flex;
-            justify-content: center;
-            align-items: center;
+        .control-panel {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.08);
+            padding: 2rem;
+            margin-bottom: 2rem;
         }
 
-        #mainCanvas {
-            max-width: 100%;
-            max-height: 100%;
-            object-fit: contain;
+        .upload-section {
+            border: 2px dashed var(--neutral-gray);
+            border-radius: 8px;
+            padding: 3rem 2rem;
+            text-align: center;
+            margin: 2rem 0;
+            transition: border-color 0.3s ease;
         }
 
-        .upload-placeholder {
-            position: absolute;
-            color: #666;
-            pointer-events: none;
+        .upload-section:hover {
+            border-color: var(--accent-blue);
         }
 
-        .tools {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 20px;
-            flex-wrap: wrap;
+        .preset-bar {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+            margin: 1.5rem 0;
         }
 
-        button {
-            padding: 10px 20px;
-            background: #007bff;
-            color: white;
+        .preset-btn {
+            background: var(--neutral-gray);
             border: none;
+            padding: 0.8rem;
             border-radius: 4px;
             cursor: pointer;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+
+        .preset-btn.active {
+            background: var(--accent-blue);
+            color: white;
         }
 
         .quality-control {
-            display: flex;
-            align-items: center;
-            gap: 10px;
+            margin: 2rem 0;
         }
 
-        .download-btn {
-            padding: 10px 20px;
-            background: #28a745;
-            color: white;
-            text-decoration: none;
-            border-radius: 4px;
-            display: none;
+        .slider-container {
+            background: var(--neutral-gray);
+            height: 6px;
+            border-radius: 3px;
+            margin: 1rem 0;
+        }
+
+        .slider {
+            -webkit-appearance: none;
+            width: 100%;
+            height: 6px;
+            background: var(--accent-blue);
+            outline: none;
+            opacity: 0.7;
+            transition: opacity 0.2s;
+        }
+
+        .preview-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .preview-card {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.08);
+            overflow: hidden;
+        }
+
+        .stat-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9rem;
+        }
+
+        .stat-table td {
+            padding: 0.6rem;
+            border-top: 1px solid var(--neutral-gray);
+        }
+
+        .progress-bar {
+            height: 4px;
+            background: var(--accent-blue);
+            width: 0%;
+            transition: width 0.3s ease;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <input type="file" id="fileInput" accept="image/*">
-        <div id="canvasContainer">
-            <div class="upload-placeholder">Upload an Image (Max 5MB)</div>
-            <canvas id="mainCanvas"></canvas>
+    <header class="header">
+        <div class="container">
+            <h1 class="header-title">
+                <i class="fas fa-compress-alt"></i>
+                JPEG Optimizer
+            </h1>
         </div>
-        
-        <div class="tools">
-            <button onclick="processImage('enhance')">Enhance</button>
-            <button onclick="processImage('compress')">Compress</button>
+    </header>
+
+    <main class="container">
+        <div class="control-panel">
+            <div class="upload-section" id="dropZone">
+                <input type="file" id="fileInput" accept="image/jpeg" multiple hidden>
+                <div class="upload-content">
+                    <i class="fas fa-cloud-upload-alt fa-3x" style="color: var(--accent-blue); margin-bottom: 1rem;"></i>
+                    <h2>Drag JPEG Files Here</h2>
+                    <p>or click to select files</p>
+                    <div class="batch-control" style="margin-top: 1.5rem;">
+                        <label class="preset-btn">
+                            <input type="checkbox" id="zipDownload"> 
+                            Compress as Archive
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="preset-bar">
+                <button class="preset-btn active" data-quality="75">Balanced</button>
+                <button class="preset-btn" data-quality="90">High Quality</button>
+                <button class="preset-btn" data-quality="50">Maximum Compression</button>
+            </div>
+
             <div class="quality-control">
-                <label>Quality:</label>
-                <input type="range" id="quality" min="0.1" max="1" step="0.1" value="0.8">
+                <div class="flex-row" style="display: flex; justify-content: space-between;">
+                    <span>Compression Level</span>
+                    <span id="qualityValue">75%</span>
+                </div>
+                <div class="slider-container">
+                    <input type="range" id="qualitySlider" class="slider" min="10" max="100" value="75">
+                </div>
             </div>
         </div>
-        
-        <a id="downloadBtn" class="download-btn">Download</a>
-    </div>
 
-    <script>
-        const canvas = document.getElementById('mainCanvas');
-        const ctx = canvas.getContext('2d');
-        const container = document.getElementById('canvasContainer');
-        const placeholder = document.querySelector('.upload-placeholder');
-        let currentImage = null;
-        let lastOperation = 'original';
+        <div class="progress-bar"></div>
 
-        // Handle file input
-        document.getElementById('fileInput').addEventListener('change', function(e) {
-            const file = e.target.files[0];
-            if (file && file.size > 5 * 1024 * 1024) {
-                alert('File size exceeds 5MB limit!');
-                return;
-            }
-            
-            if (file) {
-                placeholder.style.display = 'none';
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    loadImage(e.target.result);
-                    lastOperation = 'original';
-                };
-                reader.readAsDataURL(file);
-            }
-        });
+        <div class="preview-grid" id="previewContainer"></div>
+    </main>
 
-        // Load image with proper scaling
-        function loadImage(src) {
-            currentImage = new Image();
-            currentImage.onload = () => {
-                const containerWidth = container.clientWidth - 40;
-                const containerHeight = container.clientHeight - 40;
-                
-                const scale = Math.min(
-                    containerWidth / currentImage.width,
-                    containerHeight / currentImage.height
-                );
-                
-                canvas.width = currentImage.width * scale;
-                canvas.height = currentImage.height * scale;
-                ctx.drawImage(currentImage, 0, 0, canvas.width, canvas.height);
-            };
-            currentImage.src = src;
-        }
-
-        // Image processing
-        function processImage(action) {
-            if (!currentImage) {
-                alert('Please upload an image first!');
-                return;
-            }
-
-            switch(action) {
-                case 'enhance':
-                    enhanceImage();
-                    break;
-                case 'compress':
-                    compressImage();
-                    break;
-            }
-        }
-
-        function enhanceImage() {
-            ctx.filter = 'brightness(1.1) contrast(1.1) saturate(1.2)';
-            ctx.drawImage(currentImage, 0, 0, canvas.width, canvas.height);
-            ctx.filter = 'none';
-            
-            // Prepare enhanced download
-            canvas.toBlob((blob) => {
-                const url = URL.createObjectURL(blob);
-                const downloadBtn = document.getElementById('downloadBtn');
-                downloadBtn.href = url;
-                downloadBtn.download = `enhanced-${Date.now()}.jpg`;
-                downloadBtn.style.display = 'inline-block';
-            }, 'image/jpeg', 0.9);
-        }
-
-        function compressImage() {
-            const quality = document.getElementById('quality').value;
-            
-            canvas.toBlob((blob) => {
-                const url = URL.createObjectURL(blob);
-                const downloadBtn = document.getElementById('downloadBtn');
-                downloadBtn.href = url;
-                downloadBtn.download = `compressed-${Date.now()}.jpg`;
-                downloadBtn.style.display = 'inline-block';
-            }, 'image/jpeg', quality);
-        }
-    </script>
+    <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/exif-js"></script>
+    <script src="script.js"></script>
 </body>
 </html>
