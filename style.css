@@ -39,6 +39,8 @@
     animation: progressExpand 0.3s ease-out forwards;
 }
 
+}
+
 /* Error States */
 .error-notification {
     background: #d7191c;

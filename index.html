@@ -6,7 +6,6 @@
     <title>JPEG Optimizer | Secure Browser Compression</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        /* Updated CSS */
         body {
             font-family: 'Segoe UI', system-ui, sans-serif;
             margin: 0;
@@ -35,14 +34,6 @@
             box-shadow: -2px 0 8px rgba(0,0,0,0.05);
         }
 
-        .ad-placeholder {
-            text-align: center;
-            padding: 20px;
-            color: #888;
-            border: 2px dashed #e4e4e4;
-            margin: 20px;
-        }
-
         .upload-section {
             background: white;
             border: 2px dashed #e4e4e4;
@@ -57,13 +48,14 @@
             margin: 20px 0;
         }
 
-        .upload-section.has-files {
-            padding: 20px;
-            justify-content: flex-start;
-        }
-
-        #uploadPrompt {
-            transition: opacity 0.3s ease;
+        #fileInput {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            cursor: pointer;
         }
 
         .file-list {
@@ -71,6 +63,7 @@
             overflow-y: auto;
             width: 100%;
             margin-top: 15px;
+            text-align: left;
         }
 
         .file-item {
@@ -81,44 +74,80 @@
             align-items: center;
         }
 
-        #downloadAll {
-            margin-top: 15px;
+        .preset-bar {
+            display: flex;
+            gap: 10px;
+            margin: 20px 0;
+            justify-content: center;
+        }
+
+        .preset-btn {
+            padding: 8px 20px;
+            border: 1px solid #0066b8;
+            border-radius: 4px;
+            background: white;
+            color: #0066b8;
+            cursor: pointer;
+        }
+
+        .preset-btn.active {
             background: #0066b8;
             color: white;
-            padding: 12px 25px;
+        }
+
+        .download-btn {
+            background: #0066b8;
+            color: white;
             border: none;
+            padding: 12px 25px;
             border-radius: 4px;
             cursor: pointer;
-            display: none;
+            margin-top: 15px;
+        }
+
+        .ad-placeholder {
+            text-align: center;
+            padding: 20px;
+            color: #888;
+            border: 2px dashed #e4e4e4;
+            margin: 20px;
+        }
+
+        .header {
+            background: #1c1c1c;
+            color: white;
+            padding: 20px;
+            margin-bottom: 20px;
         }
     </style>
 </head>
 <body>
     <div class="main-content">
         <div class="header">
-            <h1 class="header-title">
-                <i class="fas fa-compress-alt"></i>
-                JPEG Optimizer
+            <h1 style="margin:0;">
+                <i class="fas fa-compress-alt"></i> JPEG Optimizer
             </h1>
         </div>
 
-        <div class="control-panel">
-            <div class="upload-section" id="dropZone">
-                <input type="file" id="fileInput" accept="image/jpeg" multiple 
-                       style="position: absolute; opacity: 0; width: 100%; height: 100%; cursor: pointer;">
-                
-                <div id="uploadPrompt">
-                    <i class="fas fa-cloud-upload-alt fa-3x" style="color: #0066b8; margin-bottom: 15px;"></i>
-                    <h2 style="margin: 0 0 8px 0;">Drag JPEG Files Here</h2>
-                    <p style="margin: 0; color: #666;">or click to select files</p>
-                </div>
-
-                <div class="file-list" id="fileList"></div>
-                <button id="downloadAll">
-                    <i class="fas fa-download"></i> Download All
-                </button>
-            </div>
+        <div class="preset-bar">
+            <button class="preset-btn active" data-quality="75">Optimum</button>
+            <button class="preset-btn" data-quality="90">Max Quality</button>
+            <button class="preset-btn" data-quality="50">Max Compression</button>
         </div>
+
+        <div class="upload-section" id="dropZone">
+            <input type="file" id="fileInput" accept="image/jpeg" multiple>
+            <div id="uploadPrompt">
+                <i class="fas fa-cloud-upload-alt fa-3x" style="color:#0066b8;margin-bottom:15px;"></i>
+                <h2 style="margin:0 0 8px 0;">Drag JPEG Files Here</h2>
+                <p style="margin:0;color:#666;">or click to select files</p>
+            </div>
+            <div class="file-list" id="fileList"></div>
+        </div>
+
+        <button class="download-btn" id="downloadAll" style="display:none;">
+            <i class="fas fa-file-archive"></i> Download All as ZIP
+        </button>
     </div>
 
     <div class="ad-sidebar">
@@ -128,8 +157,106 @@
         </div>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
     <script>
-        // JavaScript remains same as previous implementation
+        document.addEventListener('DOMContentLoaded', () => {
+            const fileInput = document.getElementById('fileInput');
+            const fileList = document.getElementById('fileList');
+            const downloadAllBtn = document.getElementById('downloadAll');
+            const presets = document.querySelectorAll('.preset-btn');
+            
+            let files = [];
+            let compressedResults = [];
+            let currentQuality = 75;
+
+            // File handling
+            fileInput.addEventListener('change', handleFiles);
+
+            // Preset handling
+            presets.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    presets.forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    currentQuality = btn.dataset.quality;
+                    if(files.length > 0) compressFiles();
+                });
+            });
+
+            // File processing
+            async function handleFiles(e) {
+                files = [...e.target.files];
+                fileInput.value = '';
+                updateFileList();
+                await compressFiles();
+            }
+
+            async function compressFiles() {
+                downloadAllBtn.style.display = 'none';
+                compressedResults = await Promise.all(files.map(async (file) => {
+                    const compressedBlob = await compressFile(file, currentQuality);
+                    return {
+                        original: file,
+                        compressed: compressedBlob
+                    };
+                }));
+                updateFileList();
+                downloadAllBtn.style.display = 'block';
+            }
+
+            function updateFileList() {
+                fileList.innerHTML = files.map((file, index) => `
+                    <div class="file-item">
+                        <span>${file.name}</span>
+                        <div class="file-stats">
+                            <span>Original: ${formatBytes(file.size)}</span>
+                            ${compressedResults[index] ? 
+                                `<span>Compressed: ${formatBytes(compressedResults[index].compressed.size)}</span>` : 
+                                '<span>Processing...</span>'}
+                        </div>
+                    </div>
+                `).join('');
+            }
+
+            // ZIP download handling
+            downloadAllBtn.addEventListener('click', async () => {
+                const zip = new JSZip();
+                const folder = zip.folder('compressed_images');
+                
+                compressedResults.forEach((result, index) => {
+                    folder.file(`image_${index}.jpg`, result.compressed);
+                });
+
+                const content = await zip.generateAsync({ type: 'blob' });
+                const link = document.createElement('a');
+                link.href = URL.createObjectURL(content);
+                link.download = 'compressed_images.zip';
+                link.click();
+            });
+
+            // Helper functions
+            function formatBytes(bytes) {
+                return (bytes / 1024).toFixed(1) + ' KB';
+            }
+
+            async function compressFile(file, quality) {
+                return new Promise((resolve) => {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        const img = new Image();
+                        img.onload = function() {
+                            const canvas = document.createElement('canvas');
+                            canvas.width = img.width;
+                            canvas.height = img.height;
+                            const ctx = canvas.getContext('2d');
+                            ctx.drawImage(img, 0, 0);
+                            canvas.toBlob(blob => resolve(blob), 'image/jpeg', quality/100);
+                        };
+                        img.src = e.target.result;
+                    };
+                    reader.readAsDataURL(file);
+                });
+            }
+        });
     </script>
 </body>
 </html>
