@@ -80,3 +80,20 @@ function toggleProcessingState(isProcessing) {
     uploadZone.style.opacity = isProcessing ? 0.6 : 1;
     uploadZone.style.pointerEvents = isProcessing ? 'none' : 'all';
 }
+
+const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
+
+async function handleFiles(e) {
+  files = [...e.target.files].filter(file => {
+    if(file.size > MAX_FILE_SIZE) {
+      alert(`Skipped ${file.name}: Max size 10MB`);
+      return false;
+    }
+    return true;
+  });
+  
+  if(files.length > 0) {
+    updateFileList();
+    await compressFiles();
+  }
+}
