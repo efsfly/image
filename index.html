@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>JPEG Optimizer | Secure Browser Compression</title>
+    <title>JPEG Optimizer</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         * {
@@ -13,127 +13,68 @@
         }
 
         body {
-            font-family: 'Segoe UI', system-ui, sans-serif;
+            font-family: 'Segoe UI', sans-serif;
             background: #f7f7f7;
-            color: #2d2d2d;
             min-height: 100vh;
             display: flex;
             flex-direction: column;
         }
 
-        .header {
+        header {
             background: #1c1c1c;
             color: white;
             padding: 15px;
-            width: 100%;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            position: sticky;
-            top: 0;
-            z-index: 100;
+            text-align: center;
         }
 
-        .content-container {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .main-content {
+        main {
             flex: 1;
             padding: 20px;
             max-width: 1200px;
-            width: 100%;
             margin: 0 auto;
-        }
-
-        .ad-sidebar {
-            background: #fff;
-            padding: 20px;
-            border-top: 1px solid #e4e4e4;
-            order: 2;
+            width: 100%;
         }
 
         .upload-section {
             background: white;
-            border: 2px dashed #e4e4e4;
+            border: 2px dashed #ccc;
             border-radius: 8px;
             padding: 30px;
             text-align: center;
+            margin: 20px 0;
             position: relative;
             min-height: 250px;
             display: flex;
             flex-direction: column;
             justify-content: center;
-            margin: 20px 0;
         }
 
-        @media (min-width: 768px) {
-            .content-container {
-                flex-direction: row;
-            }
-
-            .main-content {
-                padding: 30px;
-                margin-right: 300px;
-            }
-
-            .ad-sidebar {
-                width: 300px;
-                height: 100vh;
-                position: fixed;
-                right: 0;
-                border-top: none;
-                border-left: 1px solid #e4e4e4;
-                box-shadow: -2px 0 8px rgba(0,0,0,0.05);
-                order: 1;
-            }
-        }
-
-        /* Rest of the CSS from previous implementation */
         #fileInput {
             position: absolute;
-            top: 0;
-            left: 0;
             width: 100%;
             height: 100%;
             opacity: 0;
+            top: 0;
+            left: 0;
             cursor: pointer;
-        }
-
-        .file-list {
-            flex: 1;
-            overflow-y: auto;
-            width: 100%;
-            margin-top: 15px;
-            text-align: left;
-        }
-
-        .file-item {
-            display: flex;
-            justify-content: space-between;
-            padding: 10px;
-            border-bottom: 1px solid #eee;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 8px;
         }
 
         .preset-bar {
             display: flex;
             gap: 10px;
             margin: 20px 0;
-            flex-wrap: wrap;
             justify-content: center;
+            flex-wrap: wrap;
         }
 
         .preset-btn {
-            padding: 8px 15px;
-            border: 1px solid #0066b8;
-            border-radius: 4px;
+            padding: 10px 20px;
+            border: 2px solid #0066b8;
+            border-radius: 20px;
             background: white;
             color: #0066b8;
             cursor: pointer;
-            font-size: 14px;
+            transition: all 0.2s ease;
         }
 
         .preset-btn.active {
@@ -141,254 +82,218 @@
             color: white;
         }
 
+        .file-list {
+            background: white;
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 20px;
+        }
+
+        .file-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+        }
+
         .download-btn {
             background: #0066b8;
             color: white;
             border: none;
-            padding: 12px 25px;
-            border-radius: 4px;
+            padding: 12px 30px;
+            border-radius: 20px;
             cursor: pointer;
-            margin-top: 15px;
-            width: 100%;
+            margin: 20px auto;
+            display: block;
         }
 
-        .ad-placeholder {
-            text-align: center;
+        .features {
+            display: flex;
+            gap: 20px;
+            margin: 40px 0;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .feature-card {
+            background: white;
             padding: 20px;
-            color: #888;
-            border: 2px dashed #e4e4e4;
-            margin: 0 auto;
-            max-width: 300px;
-        }
-
-        @media (min-width: 768px) {
-            .download-btn {
-                width: auto;
-            }
+            border-radius: 8px;
+            width: 280px;
+            text-align: center;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
         }
     </style>
 </head>
 <body>
-    <div class="header">
-        <h1 style="margin:0;font-size:1.5rem;text-align:center;">
-            <i class="fas fa-compress-alt"></i> JPEG Optimizer
-        </h1>
-      </div>
+    <header>
+        <h1><i class="fas fa-compress-alt"></i> JPEG Optimizer</h1>
+    </header>
 
-  <!-- Add this right after the closing </div> of the upload-section -->
-<div class="features-section">
-    <h2 style="text-align:center;margin-bottom:25px;color:#1c1c1c;">Why Use Our JPEG Optimizer?</h2>
-    <div class="features-grid">
-        <div class="feature-card">
-            <i class="fas fa-lock"></i>
-            <h3>Browser-Side Security</h3>
-            <p>Your images never leave your device - all processing done locally</p>
-        </div>
-        <div class="feature-card">
-            <i class="fas fa-tachometer-alt"></i>
-            <h3>Instant Compression</h3>
-            <p>Real-time previews with quality/size comparisons</p>
-        </div>
-        <div class="feature-card">
-            <i class="fas fa-file-download"></i>
-            <h3>Batch Export</h3>
-            <p>Download multiple optimized images in one click</p>
-        </div>
-        <div class="feature-card">
-            <i class="fas fa-sliders-h"></i>
-            <h3>Smart Presets</h3>
-            <p>Optimized profiles for different use cases</p>
-        </div>
-    </div>
-</div>
-
-<!-- Updated CSS to match your existing design -->
-<style>
-    .features-section {
-        margin: 25px 0;
-        padding: 20px 0 0;
-    }
-
-    .features-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-        gap: 15px;
-        max-width: 1200px;
-        margin: 0 auto;
-    }
-
-    .feature-card {
-        background: #fff;
-        padding: 20px;
-        border-radius: 6px;
-        text-align: center;
-        border: 1px solid #e4e4e4;
-        transition: all 0.2s ease;
-    }
-
-    .feature-card:hover {
-        border-color: #0066b8;
-        box-shadow: 0 3px 12px rgba(0,102,184,0.08);
-    }
-
-    .feature-card i {
-        font-size: 1.8rem;
-        color: #0066b8;
-        margin-bottom: 12px;
-    }
-
-    .feature-card h3 {
-        color: #2d2d2d;
-        margin: 8px 0;
-        font-size: 1rem;
-        font-weight: 600;
-    }
-
-    .feature-card p {
-        color: #666;
-        font-size: 0.85rem;
-        line-height: 1.4;
-        margin: 0;
-    }
-
-    @media (max-width: 768px) {
-        .features-grid {
-            grid-template-columns: 1fr;
-            padding: 0 10px;
-        }
-        
-        .features-section {
-            margin: 20px 0;
-            padding: 0;
-        }
-    }
-</style>
-  
-    <div class="content-container">
-        <div class="main-content">
-            <div class="preset-bar">
-                <button class="preset-btn active" data-quality="75">Optimum</button>
-                <button class="preset-btn" data-quality="90">Max Quality</button>
-                <button class="preset-btn" data-quality="50">Max Compression</button>
+    <main>
+        <section class="upload-section">
+            <input type="file" id="fileInput" accept="image/jpeg" multiple>
+            <div id="uploadPrompt">
+                <i class="fas fa-cloud-upload-alt fa-3x" style="color:#0066b8;"></i>
+                <h2>Click to Upload JPEG Files</h2>
+                <p>Max file size: 20MB</p>
             </div>
+            <div class="file-list" id="fileList"></div>
+        </section>
 
-            <div class="upload-section" id="dropZone">
-                <input type="file" id="fileInput" accept="image/jpeg" multiple>
-                <div id="uploadPrompt">
-                    <i class="fas fa-cloud-upload-alt fa-2x" style="color:#0066b8;margin-bottom:15px;"></i>
-                    <h2 style="margin:0 0 8px 0;font-size:1.2rem;">Drag JPEG Files Here</h2>
-                    <p style="margin:0;color:#666;">or click to select files</p>
-                </div>
-                <div class="file-list" id="fileList"></div>
-            </div>
-
-            <button class="download-btn" id="downloadAll" style="display:none;">
-                <i class="fas fa-file-archive"></i> Download All as ZIP
-            </button>
+        <div class="preset-bar">
+            <button class="preset-btn active" data-quality="75">Balanced</button>
+            <button class="preset-btn" data-quality="90">High Quality</button>
+            <button class="preset-btn" data-quality="50">Max Compression</button>
         </div>
 
-        <div class="ad-sidebar">
-            <div class="ad-placeholder">
-                Advertisement Space<br>
-                (300x600px)
+        <button class="download-btn" id="downloadAll" style="display: none;">
+            <i class="fas fa-download"></i> Download Files
+        </button>
+
+        <section class="features">
+            <div class="feature-card">
+                <i class="fas fa-lock fa-2x"></i>
+                <h3>Secure Processing</h3>
+                <p>Files never leave your device</p>
             </div>
-        </div>
-    </div>
+            <div class="feature-card">
+                <i class="fas fa-tachometer-alt fa-2x"></i>
+                <h3>Fast Compression</h3>
+                <p>Optimize images in seconds</p>
+            </div>
+        </section>
+    </main>
 
     <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
     <script>
-        // JavaScript remains the same as previous implementation
         document.addEventListener('DOMContentLoaded', () => {
             const fileInput = document.getElementById('fileInput');
             const fileList = document.getElementById('fileList');
-            const downloadAllBtn = document.getElementById('downloadAll');
+            const downloadBtn = document.getElementById('downloadAll');
             const presets = document.querySelectorAll('.preset-btn');
+            const MAX_SIZE = 20 * 1024 * 1028; // 20MB
             
-            let files = [];
-            let compressedResults = [];
             let currentQuality = 75;
+            let originalFiles = [];
+            let compressedFiles = [];
 
+            // File input handler
             fileInput.addEventListener('change', handleFiles);
 
+            // Preset button handler
             presets.forEach(btn => {
                 btn.addEventListener('click', () => {
                     presets.forEach(b => b.classList.remove('active'));
                     btn.classList.add('active');
-                    currentQuality = btn.dataset.quality;
-                    if(files.length > 0) compressFiles();
+                    currentQuality = parseInt(btn.dataset.quality);
+                    if(originalFiles.length) processFiles(originalFiles);
                 });
             });
 
+            // Handle files
             async function handleFiles(e) {
-                files = [...e.target.files];
-                fileInput.value = '';
-                updateFileList();
-                await compressFiles();
-            }
-
-            async function compressFiles() {
-                downloadAllBtn.style.display = 'none';
-                compressedResults = await Promise.all(files.map(async (file) => {
-                    const compressedBlob = await compressFile(file, currentQuality);
-                    return {
-                        original: file,
-                        compressed: compressedBlob
-                    };
-                }));
-                updateFileList();
-                downloadAllBtn.style.display = 'block';
-            }
-
-            function updateFileList() {
-                fileList.innerHTML = files.map((file, index) => `
-                    <div class="file-item">
-                        <span>${file.name}</span>
-                        <div class="file-stats">
-                            <span>Original: ${formatBytes(file.size)}</span>
-                            ${compressedResults[index] ? 
-                                `<span>Compressed: ${formatBytes(compressedResults[index].compressed.size)}</span>` : 
-                                '<span>Processing...</span>'}
-                        </div>
-                    </div>
-                `).join('');
-            }
-
-            downloadAllBtn.addEventListener('click', async () => {
-                const zip = new JSZip();
-                const folder = zip.folder('compressed_images');
+                const files = Array.from(e.target.files).filter(file => {
+                    if(file.size > MAX_SIZE) {
+                        alert(`File too large: ${file.name}`);
+                        return false;
+                    }
+                    return true;
+                });
                 
-                compressedResults.forEach((result, index) => {
-                    folder.file(`image_${index}.jpg`, result.compressed);
+                if(files.length === 0) return;
+                
+                originalFiles = files;
+                await processFiles(files);
+            }
+
+            // Process files
+            async function processFiles(files) {
+                fileList.innerHTML = '';
+                downloadBtn.style.display = 'none';
+
+                // Create file list items
+                files.forEach(file => {
+                    const div = document.createElement('div');
+                    div.className = 'file-item';
+                    div.innerHTML = `
+                        <span>${file.name}</span>
+                        <div>
+                            <span class="original-size">${formatBytes(file.size)}</span>
+                            → 
+                            <span class="compressed-size">Processing...</span>
+                        </div>
+                    `;
+                    fileList.appendChild(div);
                 });
 
-                const content = await zip.generateAsync({ type: 'blob' });
-                const link = document.createElement('a');
-                link.href = URL.createObjectURL(content);
-                link.download = 'compressed_images.zip';
-                link.click();
+                // Compress files
+                compressedFiles = await Promise.all(files.map(async (file, index) => {
+                    try {
+                        const compressedBlob = await compressImage(file, currentQuality);
+                        const compressedSize = formatBytes(compressedBlob.size);
+                        fileList.children[index].querySelector('.compressed-size').textContent = compressedSize;
+                        return { name: file.name, blob: compressedBlob };
+                    } catch (error) {
+                        console.error('Compression error:', error);
+                        return null;
+                    }
+                }));
+
+                compressedFiles = compressedFiles.filter(file => file !== null);
+                downloadBtn.style.display = compressedFiles.length > 0 ? 'block' : 'none';
+            }
+
+            // Compression function
+            function compressImage(file, quality) {
+                return new Promise((resolve, reject) => {
+                    const img = new Image();
+                    img.src = URL.createObjectURL(file);
+                    
+                    img.onload = () => {
+                        const canvas = document.createElement('canvas');
+                        canvas.width = img.width;
+                        canvas.height = img.height;
+                        const ctx = canvas.getContext('2d');
+                        ctx.drawImage(img, 0, 0);
+                        
+                        canvas.toBlob(blob => {
+                            if(!blob) reject('Compression failed');
+                            resolve(blob);
+                        }, 'image/jpeg', quality/100);
+                    };
+                    
+                    img.onerror = () => reject('Image load error');
+                });
+            }
+
+            // Download handler
+            downloadBtn.addEventListener('click', async () => {
+                if(compressedFiles.length === 0) return;
+
+                if(compressedFiles.length === 1) {
+                    // Single file download
+                    const link = document.createElement('a');
+                    link.href = URL.createObjectURL(compressedFiles[0].blob);
+                    link.download = `compressed-${compressedFiles[0].name}`;
+                    link.click();
+                } else {
+                    // ZIP download
+                    const zip = new JSZip();
+                    compressedFiles.forEach(file => {
+                        zip.file(`compressed-${file.name}`, file.blob);
+                    });
+                    const content = await zip.generateAsync({ type: 'blob' });
+                    const link = document.createElement('a');
+                    link.href = URL.createObjectURL(content);
+                    link.download = 'compressed-images.zip';
+                    link.click();
+                }
             });
 
+            // Helper function
             function formatBytes(bytes) {
-                return (bytes / 1024).toFixed(1) + ' KB';
-            }
-
-            async function compressFile(file, quality) {
-                return new Promise((resolve) => {
-                    const reader = new FileReader();
-                    reader.onload = function(e) {
-                        const img = new Image();
-                        img.onload = function() {
-                            const canvas = document.createElement('canvas');
-                            canvas.width = img.width;
-                            canvas.height = img.height;
-                            const ctx = canvas.getContext('2d');
-                            ctx.drawImage(img, 0, 0);
-                            canvas.toBlob(blob => resolve(blob), 'image/jpeg', quality/100);
-                        };
-                        img.src = e.target.result;
-                    };
-                    reader.readAsDataURL(file);
-                });
+                return (bytes/1024).toFixed(1) + ' KB';
             }
         });
     </script>
